@@ -1,0 +1,313 @@
+///RANDOM NOTES//
+-React is a javascript library for building user interfaces
+
+-What to write in index.js
+  import React from "react";
+  import App from "./App";
+  import {createRoot} from "react-dom/client";
+
+  const container=document.querySelector('#root')
+  const root=createRoot(container)
+  root.render(<App/>)
+
+-What to write in App.js(function component)
+ import React from "react"
+ function App() {
+     return(
+         <div>
+             <h1 className='title'>Hello there</h1>
+         </div>
+     )
+
+ }
+
+
+ export default App
+
+
+/////useState/////
+-We use a state system anytime we want react to update the content on the screen.
+
+
+
+-In React it's a normal convention to use double quotes in JSX properties like: class="label"  for="name"  and single quotes anywhere else like:  style={{background:"blue",color:'white',border:'none'}}
+-Although you can still use it either way
+
+
+
+////CALLING A VARIABLE AND A COMPONENT IN JSX////
+-When you want to call a variable in a jsx file we use curly bracels{clickOnMe})
+-But when you want to call a component in jsx we use <App/>
+
+
+
+
+////MAIN NOTES////
+
+QUESTION1=Create a JSX code from this HTML code:
+            <div>
+            <label class="label" for="name">
+            Enter name:
+            <label/>
+            <input id="name" type="text" />
+             <button style="background-color: blue; color:white">Submit</button>
+            <div/>
+
+QUESTION2
+Create a function called clickOnMe() that returns a string of "click me" and indent it in the button of the question above
+
+
+
+
+
+
+
+
+
+
+
+
+
+Answers
+       QUESTION 1
+                   <div>
+                       <label className='label' htmlFor="name">Enter Name</label>
+                       <input type="text" id='name'/>
+                       <button style={{background: "blue", color: 'white', border: 'none'}}>submit</button>
+                   </div>
+
+
+       QUESTION 2
+                 function clickOnMe() {
+                     return 'click me'
+                 }
+
+                 <button style={{background: "blue", color: 'white', border: 'none'}}>  {clickOnMe()}  </button>
+
+
+
+ ////PROPS or PROPERTIES////
+-This is system for passing data from a parent component to a child component.
+-The goal of PROPS is to customize/configure a child component or how the user interacts with it.
+
+
+
+///  WHAT'S A COMPONENT  //
+-This is a function or a class that produces HTML to show the user using JSX and handles feedback from the user using event handlers.
+
+
+///  SIMILARITIES BTW FUNCTIONAL COMPONENT AND A CLASS COMPONENT  ///
+-They both produce JSX to show content to the user
+-Class component Can use the lifecycle Method system to run code at specific points in time while functional components uses HOOKS to run code at a specific points in time
+-Class component use the 'STATE' system to update content on the screen while functional components uses HOOKS to access state system and update content on the screen
+
+
+///  Creating Event Handlers  ///
+-When we pass a function to a method like onChange={onInputChange} we don't put paranthesis() cause the function is going to be called everytime your component is rendered.We don't want to call it everytime our component is rendered instead we want to call it at a specific point in time.
+
+        onInputChange(){
+
+        }
+
+        onChange={this.onInputChange} //we called the func without paranthesis
+
+      OTHER TYPES OF EVENT HANDLERS
+user clicks on something -> onClick
+user changes text in an input -> onChange
+user submits form --> onSubmit
+
+
+///  CONTROLLED AND UNCONTROLLED ELEMENTS  ///
+
+-This is summ code for controlled element
+class SearchBar extends React.Component{
+state={term:''}
+    render() {
+        return(
+            <div className=" ui segment">
+                <form className="ui form">
+                    <div className='field'>
+                        <label htmlFor="text">Image Search</label>
+                        <input type="text" value={this.state.term} id="text"  onChange={(e)=>this.setState({term:e.target.value})}/>
+                    </div>
+                </form>
+
+            </div>
+        )
+
+    }
+};
+
+-The flow of the code of a controlled element
+  1.User types in input
+  2.Callback gets invoked(onChange={(e)=>this.setState({term:e.target.value})})
+  3.We call setState with the new value (this.setState({term:e.target.value)
+  4.Component rerenders.
+  5.Input is told what its value is (coming from state)
+
+-Difference btw controlled component and uncontrolled components is with controlled component we reference the value on our react component so that we can know the value without checking our DOM(html) and with uncontrolled we have to check our DOM to know the value which isn't ideal.
+-It's not bad when we store the value on our DOM but it makes it easier if we save it in the react world cause it's easy to manipulate it
+         e.g
+             this.setState({term:e.target.value.toUpperCase()})}
+-We made the user to type in uppercase characters without typing the capslock button
+
+
+
+  /// Understanding 'this' in Js  ///
+
+  onFormSubmit(event){
+      event.preventDefault();
+      console.log(this.state.term)
+  }
+
+  <form onSubmit={this.onFormSubmit} className="ui form">
+
+-When we run the code above it bring an error that says "Cannot read properties of undefined (reading 'state')"
+-This error mostly comes because the value of "this" is undefined we can't figure it out.There are a few ways we can solve this context issues
+
+  1.When we change the function into an arrow function
+        onFormSubmit=(event)=>{
+            event.preventDefault();
+            console.log(this.state.term)
+         }
+    -When we use arrow function it automatically bind the value of "this" for all the code inside the function
+
+  2.Passing the arrow function into the form itself instead of putting the arrow function in the function itself and making sure we invock or call the function()
+
+      onFormSubmit(event){
+         event.preventDefault();           //The function
+         console.log(this.state.term)
+      }
+
+     <form onSubmit={(event) => this.onFormSubmit(event)} className="ui form"> //how we call it
+-To avoid all the hustle and tustle make the function an arrow function to avoid complications
+
+
+
+
+
+
+
+
+
+
+N.B
+   -Calling props with class component isn't much different with calling it with a functional component we just use = this.props.propname
+
+
+     // class based component
+     class App extends React.Component{
+
+         onSearchSubmit(term){
+             console.log(term)
+         }
+
+         render(){
+       return(
+           <div className='ui container' style={{marginTop:'10px'}}>
+             <SearchBar onUserSubmit={this.onSearchSubmit}/> //prop
+           </div>
+       )
+         }
+     }
+
+
+
+//Another class based component
+    class SearchBar extends React.Component{
+    state={term:''}
+
+    onFormSubmit=(event)=>{
+        event.preventDefault();
+        this.props.onUserSubmit(this.state.term)  //calling the prop in a class comp
+    }
+
+        render() {
+            return(
+                <div className=" ui segment">
+                          Hello
+                </div>
+            )
+
+        }
+    }
+
+
+     //// Making request with axios ////
+npm install --save axios  - this how you download axios on your react project
+-Making unsplash api request
+
+           axios.get('https://api.unsplash.com/search/photos', {
+               params: { query: term },
+               headers:{
+                   Authorization:'Client-ID VP8SEBVgpH2gZStWG02iHoWGz0kFbM-v_m_NG48v-Yo'
+               }
+           });
+
+
+
+ NB
+   -Whenever we expect a state property to contain an array or object we initialize an empty array or empty object:
+      state={images=[]}
+      state={images={}}
+
+
+
+
+
+
+ -When we want to use an arrow function inside an async function to avoid errors we do this
+
+        onSearchSubmit= async (term)=>{
+            const response=await axios.get('https://api.unsplash.com/search/photos', {
+                params: { query: term },
+                headers:{
+                    Authorization:'Client-ID VP8SEBVgpH2gZStWG02iHoWGz0kFbM-v_m_NG48v-Yo'
+                }
+            });
+
+            this.setState({images:response.data.results})
+        }
+
+
+
+////  Keys In Lists  ////
+-Key is a purely perfomance consideration that's gonna help react to render or update list to be more precise.
+-We must ensure that we include keys on every element that we render as part of a list.
+-We don't have to do it on every elements it's mostly done on list of elements.
+-Whenever we use a KEY we try to use a key property or a value of the key that cooresponds to one distinct element in the arrays which in most cases is the ID of items that we are iterating over or trying to render out into the DOM.
+-We usually add the KEY to the root tag that we are returning inside the statement.
+             const images=props.images.map((image) => {
+                 return <div key={image.id}>  //DIV is the root element
+                 <img src={image.urls.regular}/>
+                 </div>
+              })
+
+//// ACCESSING THE DOM WITH REFS ////
+-React Refs gives access to a single DOM element.
+-We create refs in the CONSTRUCTOR function, assign them to instance variables, then pass to a particular JSX element as props.
+-We can't pass it to a state function because we mostly put data in state cause we expect it to change over time.
+
+
+   ///This how we make refs.
+       constructor (props){
+           super(props)
+
+           this.imageRef = React.createRef()
+       };
+
+    ///This is how we wire it by an individual property by using ref={this.imageRef}
+       <img ref={this.imageRef} src={this.props.image.urls.regular} alt={this.props.image.description}/>
+
+
+
+
+
+-To get height in a ref first we need to reach into the DOM and figure out the height.A ref is like a JavaScript object
+        componentDidMount(){
+            this.imageRef.current.addEventListener ('load' ,this.setSpans);
+        }
+
+        setSpans = () =>{
+            console.log(this.imageRef.current.clientHeight)
+        }

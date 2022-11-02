@@ -1,0 +1,633 @@
+///RANDOM NOTES//
+-React is a javascript library for building user interfaces
+
+-What to write in index.js
+  import React from "react";
+  import App from "./App";
+  import {createRoot} from "react-dom/client";
+
+  const container=document.querySelector('#root')
+  const root=createRoot(container)
+  root.render(<App/>)
+
+-What to write in App.js(function component)
+ import React from "react"
+ function App() {
+     return(
+         <div>
+             <h1 className='title'>Hello there</h1>
+         </div>
+     )
+
+ }
+
+
+ export default App
+
+NB
+  contains is a DOM element that checks if one DOM element is contained in another DOM element
+
+
+//installing axios
+  npm install axios
+
+/////useState/////
+-We use a state system anytime we want react to update the content on the screen.
+
+
+
+-In React it's a normal convention to use double quotes in JSX properties like: class="label"  for="name"  and single quotes anywhere else like:  style={{background:"blue",color:'white',border:'none'}}
+-Although you can still use it either way
+
+
+
+////CALLING A VARIABLE AND A COMPONENT IN JSX////
+-When you want to call a variable in a jsx file we use curly bracels{clickOnMe})
+-But when you want to call a component in jsx we use <App/>
+
+
+
+
+////MAIN NOTES////
+
+QUESTION1=Create a JSX code from this HTML code:
+            <div>
+            <label class="label" for="name">
+            Enter name:
+            <label/>
+            <input id="name" type="text" />
+             <button style="background-color: blue; color:white">Submit</button>
+            <div/>
+
+QUESTION2
+Create a function called clickOnMe() that returns a string of "click me" and indent it in the button of the question above
+
+
+
+
+
+
+
+
+
+
+
+
+
+Answers
+       QUESTION 1
+                   <div>
+                       <label className='label' htmlFor="name">Enter Name</label>
+                       <input type="text" id='name'/>
+                       <button style={{background: "blue", color: 'white', border: 'none'}}>submit</button>
+                   </div>
+
+
+       QUESTION 2
+                 function clickOnMe() {
+                     return 'click me'
+                 }
+
+                 <button style={{background: "blue", color: 'white', border: 'none'}}>  {clickOnMe()}  </button>
+
+
+
+ ////PROPS or PROPERTIES////
+-This is system for passing data from a parent component to a child component.
+-The goal of PROPS is to customize/configure a child component or how the user interacts with it.
+
+
+
+///WHAT'S A COMPONENT//
+-This is a function or a class that produces HTML to show the user using JSX and handles feedback from the user using event handlers.
+
+
+
+
+///SIMILARITIES & DIFFERENCES BTW FUNCTIONAL COMPONENT AND A CLASS COMPONENT///
+-They both produce JSX to show content to the user
+-Class component Can use the lifecycle Method system to run code at specific points in time while functional components uses HOOKS to run code at a specific points in time
+-Class component use the 'STATE' system to update content on the screen while functional components uses HOOKS to access state system and update content on the screen
+-It's easier to organise code using class component than functional components.
+
+
+
+
+
+
+
+
+
+////RULES OF CLASS COMPONENTS////
+1.Must be a Javascript Class.
+2.Must extend (subclass) React.Component i.e
+3.Must define a RENDER method that returns some amount of JSX
+
+class App extends React.Component{
+
+   render(){
+            return(
+                <div>Hello</div>
+
+            )
+
+}
+
+
+
+
+
+
+
+
+
+
+
+///CONNECTING DATA FROM THE BROWSER TO THE SCREEN USING CLASS COMPONENT//
+-Sometimes with functional components it's hard or it takes time for data to render from the browser to displaying it. With class components its easier and you can tell the component to rerender itself with new information
+
+
+
+
+
+
+         ///state///
+rules of the state system
+1. only usable with class components (*might technically be used with functional components but this will be further discussed later)
+2. don't confuse props with state
+3. state is a js object that contains data relevant to a component
+4. state must be initialized when a component is created
+5. updating state on a component causes the component to (almost) instantly rerender
+6. state can only be updated using the function setState
+
+
+class App extends React.Component{
+
+      state={lat:null}
+
+
+componentDidMount(){
+      window.navigator.geolocation.getCurrentPosition(
+          position=> {
+              //we called setState
+              this.setState({lat:position.coords.latitude})
+
+              //we dont update state like this
+              this.state.lat=position.coords.latitude (wrong)
+          },
+          err=> console.log(err),
+      );
+  }
+
+    render() {
+        return <div>latitude:{this.state.lat}</div>
+    }
+}
+
+
+
+
+
+
+
+
+
+                   //////LIFECYCLE METHODS//////
+
+               ///Component Lifecycle///
+  CONSTRUCTOR
+-We use constructor to do our state initialization
+
+  RENDER
+-We use render method to return jsx and not do anything else.
+
+CONTENT VISIBLE ON SCREEN
+  componentDidMount
+-Good place to do your initial data loading and in most times it only gets invoked one time.
+
+SIT AND WAIT FOR UPDATES...
+ componentDidUpdate
+-As the name suggest this is called every single time data is updated and it's also a good place to do more data loading when state/props is changed.
+
+SIT AND WAIT UNTIL THIS COMPONENT IS NO LONGER SHOWN
+ componentWillUnmount
+-Good place to do cleanup(especially for non-react stuff)
+
+         Others lifecycle methods(rarely used)
+  shouldComponentUpdate
+  getDerivedStateFromProps
+  getSnapshotBeforeUpdate
+
+
+
+
+
+-We can take state as props from one component and pass it as a child to another component e.g
+
+<App component>
+import SeasonDisplay from "./SeasonDisplay";
+
+class App extend React.component{
+
+render(){
+    if (!this.state.error && this.state.lat ){
+            return <div><SeasonDisplay lat={this.state.lat}/></div>
+        }
+}
+}
+
+
+<season component>
+import React from "react";
+
+const SeasonDisplay=(props)=>{
+console.log(props.lat)
+}
+
+
+
+
+
+
+
+-When making a predefined API component so that we can add it to our main component we do this
+ 1.First we download axios
+    //  npm install --save axios
+
+2.Make another component inside a directory called APIs
+
+3.We import axios into our header of our newly made predefined API component
+       // import axios from "axios"
+
+4.Write code in our new component so we can link it into our main component
+
+   export default axios.create({
+       baseURL:'https://www.googleapis.com/youtube/v3',
+       params:{
+           part:'snippet',
+           maxResults:5,
+           key:KEY,
+       }
+   })
+
+5.Call the newly created component (youtube.js)  into our header of our main component which is the app.js
+     // import youtube from '../apis/youtube'
+
+6.Pass it in inside our class component outside the render method and return
+
+       onTermSubmit  = async text =>{
+           const response = await youtube.get('/search',{
+               params:{
+                   q:text
+               }
+           })
+       }
+
+
+
+
+
+///iframe element///
+-This is like any other element in HTML but this makes a request to an outside website besides the one the user is using on the screen without in ajax or stuff like that.
+-We use the iframe element by embedding some url into our site example
+
+     //Pass in the url
+    const videoSrc=`https://www.youtube.com/embed/${video.id.videoId}`
+
+    //Call the url into our return statement
+    <iframe src={videoSrc} frameborder="0"></iframe>
+
+
+
+
+
+//// PRIMITIVE HOOKS ////
+-There are differenct types of primitive hooks
+ 1.useState
+ 2.useEffect
+ 3.useRef
+ and many others
+
+ /// React Fragement /// /
+ -With React Fragment, you can render multiple elements of a component without adding extra div tags. We can write cleaner, more readable code with React Fragments. It takes up less memory and renders components faster. Each component is rendered as expected.
+    example:
+                      <React.Fragment key={item.title}>
+                        <div className='title active'>
+                          <i className='dropdown icon'></i>
+                          {item.title}
+                        </div>
+                          <div className='content active'>
+                              <p>{item.content}</p>
+                          </div>
+                      </React.Fragment>
+
+
+
+ //// HELPER FUNCTIONS ////
+ -Writing helper functions in class based components is easier and more readable to other people when they are trying to read them.
+
+  {a} Helper func in class based component
+      class Accordion extends Component {
+        onTitleClick () {
+          console.log ('Title was clicked')
+        }
+
+        render () {
+        return(
+        {this.onTitleClick}
+        )
+        }
+      }
+
+ -In functional components in other hand when we use helper functions it's a bit nasty, components end up a lil clattered and we don"t get a nice separation
+
+   {b}  Helper func in class based component
+         const Accordion = ({items}) => {
+           const onTitleClick = (index) => {
+               console.log('Title Clicked',index)
+           }
+
+             return (
+                 <div className='ui styled accordion' onClick={()=>onTitleClick(index)}>
+                 </div>
+             )
+             }
+
+
+ /// useState in a FUNCTIONAL COMPONENT ///
+-Using state in a functional component is different with using it in a class based component.
+  1.We call state when importing REACT from 'react'
+    import React,{useState} from "react";   //called {useState}
+
+  2.Initializing the state
+                            Function to
+                            change this
+                            piece of state
+                                 |
+     const  [ activeIndex , setActiveIndex ] = useState(  null  )
+                |                                          |
+             piece of                                 initial value for this
+              state                                       piece of state
+
+  3.Updating the state
+    setActiveIndex(10)
+
+  4.Referencing the state
+      {activeIndex}
+
+-When calling two components at once it's also different in class based component
+    2.Initializing the state - we initialize them in two different lines unlike in class based component=>    state={activeIndex:0,term}
+
+       const  [ activeIndex , setActiveIndex ] = useState(  null  )
+       const  [ term, setTerm ] = useState('')
+
+    3.Updating the state
+      setActiveIndex(10)
+      setTerm('yooh')
+
+    4.Referencing the state
+        {activeIndex}
+        {term}
+
+
+
+
+-When calling a setter in useState the entire component rerenders and the default value in the useState function is then going to fall away and we won't be using it anymore
+
+                        When calling setter the
+                        initial value which is null
+                           falls away
+                            |
+    const [activeIndex, setActiveIndex] = useState(null)
+
+
+
+
+
+
+
+/// useEffect in a functional component ///
+-useEffect allows us to write some code that our component is rerending and some pieces of information has changed
+
+   /// The useEffect Hook ///
+-Allows function components to use something like lifecycle methods.
+-We configure the hook to run some code automatically in one of three scenarios.
+    1.When the component is rendered for the first time only
+
+            useEffect(()=>{
+                console.log('yoooh')
+            }, []);
+
+    2.When the component is rendered for the first time and whenever it rerenders
+
+             useEffect(()=>{
+                 console.log('yoooh')
+             });
+
+    3.When the component is rendered for the first time and whenever it rerenders and some piece of data has changed.
+
+               useEffect(()=>{
+                   console.log('yoooh')
+               }, [term]);
+
+
+
+  //// Making a request using useEffect ////
+-We have ways we can make a REQUEST using ASYNC AWAIT inside a useEffect function.
+
+  1.By putting a helper function as async await inside our useEffect then call it at the end
+
+          useEffect(()=>{
+            const  search = async () => {   //making the request
+               await axios.get('https://semantic-ui.com/')
+            }
+            search()                          //calling the async await
+          },[term]);
+
+  2.By removing the function name and putting a set of paranthesis at the start and the end and another set of paranthesis at the end to call the function
+
+              useEffect(()=>{
+                  (async () => {
+                   await axios.get('https://semantic-ui.com/')
+                  })();
+              },[term]);
+
+  3.By using a normal promise.
+
+                  useEffect(()=>{
+                        axios.get('https://semantic-ui.com/')
+                            .then(()=>{
+                                console.log(response.data)
+                            })
+                  },[term]);
+
+ -There is no difference in the three methods we just listed you just choose what's easier for you.
+
+
+
+
+//// XSS ATTACK IN REACT ////
+-This is where we accidently pick up some HTML from an untrusted source.
+-Only time we make use of dangerouslySetInnerHTML={{__html}} to take a string and render it as HTML you are opening up yourself for a risk unless you are confident that the person sending you that HTML can be trusted
+
+
+                //// THROTTLING API REQUEST  ////
+-We throttle API request so that we don't call the API everytime a value is changed in the input
+-When trying to throttle an api request someone can uses a setTimeOut.
+-Everytime we use setTimeOut there is an ID we are given by the browser we can use the ID to cancel the setTimeOut
+
+const timeOutId=setTimeOut(()=>{
+ console.log('Hi there')              ///The browser gives us an ID
+},10000)
+
+
+clearTimeOut(timeOutId)   //This cancels the setTimeOut
+
+    //// useEffect CLEANUP FUNC ////
+-With useEffect we can return one function that is used to clean up request.
+-When we return the clean up function the first time react is gonna put a handle on it and it won't call it till when useEffect rerenders then it will be called first before any content inside the useEffect func.
+
+   useEffect(()=>{
+
+   console.log('Initial render or term was changed')
+
+   return () =>{
+     console.log('Clean Up')
+   }
+   })
+               ^
+               |
+     Showing how the code above works
+1.Func provided to useEffect is called when our component renders
+2.We return a cleanup function and react is gonna hold up to that cleanup function
+3.When our component rerenders and our term piece of state has changed we are gonna first invoke the cleanup function
+4.Then immediately after that the function provided to our useEffect is called the again
+
+-We can also remove an event listener in react
+To remove an event listener in React:
+
+ 1.Add the event listener in the useEffect hook.
+ 2.Return a function from the useEffect hook.
+ 3.Use the removeEventListener method to remove the event listener when the component unmounts.
+
+ more on this check link
+  https://bobbyhadz.com/blog/react-remove-event-listener#:~:text=Add%20the%20event%20listener%20in,listener%20when%20the%20component%20unmounts.
+
+
+
+/// LISTENING FOR EVENT HANDLERS TO ELEMENTS THAT AREN'T CREATED BY A COMPONENT  ///
+-In react it's kinda hard to listen to event handlers  that are not inside a particular component.
+-For instance we may have a dropdown menu, but we want to listen for CLICK in the BODY to close the dropdown.
+-This is hard cause the BODY tag isn't inside the component that makes the dropdown to show
+-Therefore we make use of useRef Hook that shows us whether a certain element is inside our component and if it's not we choose how to use it
+
+1.We Import useRef and call it inside our component
+   import React,{useState, useEffect,useRef} from "react";
+       const [open,setOpen]=useState(false)
+       const ref=useRef()
+
+2.We use useRef to the most parent element
+         <div ref={ref} className="ui form">
+           <div className="field">
+             <label className="label">Select a Color</label>
+             <div
+                 onClick={()=>setOpen(!open)}
+                 className={`ui selection dropdown ${open ? 'visible active':''}`}>
+               <i className="dropdown icon"></i>
+               <div className="text">{selected.label}</div>
+               <div className={`menu ${open ? 'visible transition':''} `}>{renderedOptions}</div>
+             </div>
+           </div>
+         </div>
+
+3.Then add some IF statement and choose what happens tho the body element that isn't inside our component
+       useEffect(()=>{
+           document.body.addEventListener('click',(event) => {
+               if (ref.current.contains(event.target)){
+                   return setOpen(true)
+               }
+               setOpen(false)
+           });
+       },[])
+
+
+
+
+
+
+
+
+                 ///////  useRef    ///////
+-useRef allows us to get a direct reference to a DOM element.
+-We get to use useRef when we want to get a reference to the most parent element of the component
+
+
+
+
+
+
+-When making post request with axios and we don't want to send any information to the body we add a third argument
+axios.post('https://google.com',{},{
+   params:{
+                   q:text,
+                   target:language.value,
+                   key:'AIzaSyCHUCmpR7cT_yDFHC98CZJy2LTms-IwDlM '
+   }
+})
+
+
+
+/// Reducing the Number of requests in API key ///
+-folder 12 video 61
+
+
+
+
+  //// Navigation in  React ////
+-When we are trying to find which location we are at on our url we use
+  window.location and the most important thing we look for there is the urls pathname
+-To search on which url route we are at we use
+
+ window.location.pathname === '/'
+ for home pages
+
+ window.location.pathname === '/list'
+ for other pages depending on the component we want to show
+
+-In most cases we build a reusable route component to avoid code repetition for instance:
+
+   const Route   = ({path, children}) => {
+     return window.location.pathname === path ? children : null;
+   }
+
+   export default Route
+
+-Above is a component we create to know on which PATH we are going and which CHILDREN component we pass as props.
+-To make use of the component we simply call it on our app.js file as:
+       return (
+           <div>
+               <Route path="/accordion">
+                   <Accordion items={items}/>
+               </Route>
+           </div>
+          )
+-The path is '/accordion' and the children component is <Accordion/>
+
+
+
+  /// CHANGING URL AND CONTENT OF THE PAGE WITHOUT MAKING MANY UNNECESSARY REQUEST ///
+-When making an anchor tag of navigation and passing href inside it this causes the content of the site and the url to change but the problem is the site completely refreshes, and we get unnecessary request that can cause the site to hang a bit.
+-So the remedy to this is to:
+
+{1}.Create a <Link> tag component that we can call instead of the <a> tags
+{2}.Change the URL but don't do a full page refresh
+   -To prevent a full page refresh we are going to use a function
+    that is directly built into the browser
+        const onClick = (event) => {
+          event.preventDefault()
+
+          window.history.pushState({},'','/translate') //THE FUNCTION
+        }
+{3}.Each Route could detect the URL has changed
+{4}.Route could update piece of state tracking the current pathname
+{5}.Each Route rerenders,showing/hiding components appropriately.

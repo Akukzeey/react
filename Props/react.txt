@@ -1,0 +1,102 @@
+///RANDOM NOTES//
+-React is a javascript library for building user interfaces
+
+-What to write in index.js
+  import React from "react";
+  import App from "./App";
+  import {createRoot} from "react-dom/client";
+
+  const container=document.querySelector('#root')
+  const root=createRoot(container)
+  root.render(<App/>)
+
+-What to write in App.js(function component)
+ import React from "react"
+ function App() {
+     return(
+         <div>
+             <h1 className='title'>Hello there</h1>
+         </div>
+     )
+
+ }
+
+
+ export default App
+
+
+/////useState/////
+-We use a state system anytime we want react to update the content on the screen.
+
+
+
+-In React it's a normal convention to use double quotes in JSX properties like: class="label"  for="name"  and single quotes anywhere else like:  style={{background:"blue",color:'white',border:'none'}}
+-Although you can still use it either way
+
+
+
+////CALLING A VARIABLE AND A COMPONENT IN JSX////
+-When you want to call a variable in a jsx file we use curly bracels{clickOnMe})
+-But when you want to call a component in jsx we use <App/>
+
+
+
+
+////MAIN NOTES////
+
+QUESTION1=Create a JSX code from this HTML code:
+            <div>
+            <label class="label" for="name">
+            Enter name:
+            <label/>
+            <input id="name" type="text" />
+             <button style="background-color: blue; color:white">Submit</button>
+            <div/>
+
+QUESTION2
+Create a function called clickOnMe() that returns a string of "click me" and indent it in the button of the question above
+
+
+
+
+
+
+
+
+
+
+
+
+
+Answers
+       QUESTION 1
+                   <div>
+                       <label className='label' htmlFor="name">Enter Name</label>
+                       <input type="text" id='name'/>
+                       <button style={{background: "blue", color: 'white', border: 'none'}}>submit</button>
+                   </div>
+
+
+       QUESTION 2
+                 function clickOnMe() {
+                     return 'click me'
+                 }
+
+                 <button style={{background: "blue", color: 'white', border: 'none'}}>  {clickOnMe()}  </button>
+
+
+
+ ////PROPS or PROPERTIES////
+-This is system for passing data from a parent component to a child component.
+-The goal of PROPS is to customize/configure a child component or how the user interacts with it.
+
+
+
+///WHAT'S A COMPONENT//
+-This is a function or a class that produces HTML to show the user using JSX and handles feedback from the user using event handlers.
+
+
+///SIMILARITIES BTW FUNCTIONAL COMPONENT AND A CLASS COMPONENT///
+-They both produce JSX to show content to the user
+-Class component Can use the lifecycle Method system to run code at specific points in time while functional components uses HOOKS to run code at a specific points in time
+-Class component use the 'STATE' system to update content on the screen while functional components uses HOOKS to access state system and update content on the screen

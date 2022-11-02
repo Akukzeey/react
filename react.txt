@@ -1,0 +1,1135 @@
+///RANDOM NOTES//
+-React is a javascript library for building user interfaces
+
+-What to write in index.js
+  import React from "react";
+  import App from "./App";
+  import {createRoot} from "react-dom/client";
+
+  const container=document.querySelector('#root')
+  const root=createRoot(container)
+  root.render(<App/>)
+
+-What to write in App.js(function component)
+ import React from "react"
+ function App() {
+     return(
+         <div>
+             <h1 className='title'>Hello there</h1>
+         </div>
+     )
+
+ }
+
+
+ export default App
+
+NB
+  contains is a DOM element that checks if one DOM element is contained in another DOM element
+
+
+//installing axios
+  npm install axios
+
+/////useState/////
+-We use a state system anytime we want react to update the content on the screen.
+
+
+
+-In React it's a normal convention to use double quotes in JSX properties like: class="label"  for="name"  and single quotes anywhere else like:  style={{background:"blue",color:'white',border:'none'}}
+-Although you can still use it either way
+
+
+
+////CALLING A VARIABLE AND A COMPONENT IN JSX////
+-When you want to call a variable in a jsx file we use curly bracels{clickOnMe})
+-But when you want to call a component in jsx we use <App/>
+
+
+
+
+////MAIN NOTES////
+
+QUESTION1=Create a JSX code from this HTML code:
+            <div>
+            <label class="label" for="name">
+            Enter name:
+            <label/>
+            <input id="name" type="text" />
+             <button style="background-color: blue; color:white">Submit</button>
+            <div/>
+
+QUESTION2
+Create a function called clickOnMe() that returns a string of "click me" and indent it in the button of the question above
+
+
+
+
+
+
+
+
+
+
+
+
+
+Answers
+       QUESTION 1
+                   <div>
+                       <label className='label' htmlFor="name">Enter Name</label>
+                       <input type="text" id='name'/>
+                       <button style={{background: "blue", color: 'white', border: 'none'}}>submit</button>
+                   </div>
+
+
+       QUESTION 2
+                 function clickOnMe() {
+                     return 'click me'
+                 }
+
+                 <button style={{background: "blue", color: 'white', border: 'none'}}>  {clickOnMe()}  </button>
+
+
+
+ ////PROPS or PROPERTIES////
+-This is system for passing data from a parent component to a child component.
+-The goal of PROPS is to customize/configure a child component or how the user interacts with it.
+
+
+
+///WHAT'S A COMPONENT//
+-This is a function or a class that produces HTML to show the user using JSX and handles feedback from the user using event handlers.
+
+
+
+
+///SIMILARITIES & DIFFERENCES BTW FUNCTIONAL COMPONENT AND A CLASS COMPONENT///
+-They both produce JSX to show content to the user
+-Class component Can use the lifecycle Method system to run code at specific points in time while functional components uses HOOKS to run code at a specific points in time
+-Class component use the 'STATE' system to update content on the screen while functional components uses HOOKS to access state system and update content on the screen
+-It's easier to organise code using class component than functional components.
+
+
+
+
+
+
+
+
+
+////RULES OF CLASS COMPONENTS////
+1.Must be a Javascript Class.
+2.Must extend (subclass) React.Component i.e
+3.Must define a RENDER method that returns some amount of JSX
+
+class App extends React.Component{
+
+   render(){
+            return(
+                <div>Hello</div>
+
+            )
+
+}
+
+
+
+
+
+
+
+
+
+
+
+///CONNECTING DATA FROM THE BROWSER TO THE SCREEN USING CLASS COMPONENT//
+-Sometimes with functional components it's hard or it takes time for data to render from the browser to displaying it. With class components its easier and you can tell the component to rerender itself with new information
+
+
+
+
+
+
+         ///state///
+rules of the state system
+1. only usable with class components (*might technically be used with functional components but this will be further discussed later)
+2. don't confuse props with state
+3. state is a js object that contains data relevant to a component
+4. state must be initialized when a component is created
+5. updating state on a component causes the component to (almost) instantly rerender
+6. state can only be updated using the function setState
+
+
+class App extends React.Component{
+
+      state={lat:null}
+
+
+componentDidMount(){
+      window.navigator.geolocation.getCurrentPosition(
+          position=> {
+              //we called setState
+              this.setState({lat:position.coords.latitude})
+
+              //we dont update state like this
+              this.state.lat=position.coords.latitude (wrong)
+          },
+          err=> console.log(err),
+      );
+  }
+
+    render() {
+        return <div>latitude:{this.state.lat}</div>
+    }
+}
+
+
+
+
+
+
+
+
+
+                   //////LIFECYCLE METHODS//////
+
+               ///Component Lifecycle///
+  CONSTRUCTOR
+-We use constructor to do our state initialization
+
+  RENDER
+-We use render method to return jsx and not do anything else.
+
+CONTENT VISIBLE ON SCREEN
+  componentDidMount
+-Good place to do your initial data loading and in most times it only gets invoked one time.
+
+SIT AND WAIT FOR UPDATES...
+ componentDidUpdate
+-As the name suggest this is called every single time data is updated and it's also a good place to do more data loading when state/props is changed.
+
+SIT AND WAIT UNTIL THIS COMPONENT IS NO LONGER SHOWN
+ componentWillUnmount
+-Good place to do cleanup(especially for non-react stuff)
+
+         Others lifecycle methods(rarely used)
+  shouldComponentUpdate
+  getDerivedStateFromProps
+  getSnapshotBeforeUpdate
+
+
+
+
+
+-We can take state as props from one component and pass it as a child to another component e.g
+
+<App component>
+import SeasonDisplay from "./SeasonDisplay";
+
+class App extend React.component{
+
+render(){
+    if (!this.state.error && this.state.lat ){
+            return <div><SeasonDisplay lat={this.state.lat}/></div>
+        }
+}
+}
+
+
+<season component>
+import React from "react";
+
+const SeasonDisplay=(props)=>{
+console.log(props.lat)
+}
+
+
+
+
+
+
+
+-When making a predefined API component so that we can add it to our main component we do this
+ 1.First we download axios
+    //  npm install --save axios
+
+2.Make another component inside a directory called APIs
+
+3.We import axios into our header of our newly made predefined API component
+       // import axios from "axios"
+
+4.Write code in our new component so we can link it into our main component
+
+   export default axios.create({
+       baseURL:'https://www.googleapis.com/youtube/v3',
+       params:{
+           part:'snippet',
+           maxResults:5,
+           key:KEY,
+       }
+   })
+
+5.Call the newly created component (youtube.js)  into our header of our main component which is the app.js
+     // import youtube from '../apis/youtube'
+
+6.Pass it in inside our class component outside the render method and return
+
+       onTermSubmit  = async text =>{
+           const response = await youtube.get('/search',{
+               params:{
+                   q:text
+               }
+           })
+       }
+
+
+
+
+
+///iframe element///
+-This is like any other element in HTML but this makes a request to an outside website besides the one the user is using on the screen without in ajax or stuff like that.
+-We use the iframe element by embedding some url into our site example
+
+     //Pass in the url
+    const videoSrc=`https://www.youtube.com/embed/${video.id.videoId}`
+
+    //Call the url into our return statement
+    <iframe src={videoSrc} frameborder="0"></iframe>
+
+
+
+
+
+//// PRIMITIVE HOOKS ////
+-There are differenct types of primitive hooks
+ 1.useState
+ 2.useEffect
+ 3.useRef
+ and many others
+
+ /// React Fragement /// /
+ -With React Fragment, you can render multiple elements of a component without adding extra div tags. We can write cleaner, more readable code with React Fragments. It takes up less memory and renders components faster. Each component is rendered as expected.
+    example:
+                      <React.Fragment key={item.title}>
+                        <div className='title active'>
+                          <i className='dropdown icon'></i>
+                          {item.title}
+                        </div>
+                          <div className='content active'>
+                              <p>{item.content}</p>
+                          </div>
+                      </React.Fragment>
+
+
+
+ //// HELPER FUNCTIONS ////
+ -Writing helper functions in class based components is easier and more readable to other people when they are trying to read them.
+
+  {a} Helper func in class based component
+      class Accordion extends Component {
+        onTitleClick () {
+          console.log ('Title was clicked')
+        }
+
+        render () {
+        return(
+        {this.onTitleClick}
+        )
+        }
+      }
+
+ -In functional components in other hand when we use helper functions it's a bit nasty, components end up a lil clattered and we don"t get a nice separation
+
+   {b}  Helper func in class based component
+         const Accordion = ({items}) => {
+           const onTitleClick = (index) => {
+               console.log('Title Clicked',index)
+           }
+
+             return (
+                 <div className='ui styled accordion' onClick={()=>onTitleClick(index)}>
+                 </div>
+             )
+             }
+
+
+ /// useState in a FUNCTIONAL COMPONENT ///
+-Using state in a functional component is different with using it in a class based component.
+  1.We call state when importing REACT from 'react'
+    import React,{useState} from "react";   //called {useState}
+
+  2.Initializing the state
+                            Function to
+                            change this
+                            piece of state
+                                 |
+     const  [ activeIndex , setActiveIndex ] = useState(  null  )
+                |                                          |
+             piece of                                 initial value for this
+              state                                       piece of state
+
+  3.Updating the state
+    setActiveIndex(10)
+
+  4.Referencing the state
+      {activeIndex}
+
+-When calling two components at once it's also different in class based component
+    2.Initializing the state - we initialize them in two different lines unlike in class based component=>    state={activeIndex:0,term}
+
+       const  [ activeIndex , setActiveIndex ] = useState(  null  )
+       const  [ term, setTerm ] = useState('')
+
+    3.Updating the state
+      setActiveIndex(10)
+      setTerm('yooh')
+
+    4.Referencing the state
+        {activeIndex}
+        {term}
+
+
+
+
+-When calling a setter in useState the entire component rerenders and the default value in the useState function is then going to fall away and we won't be using it anymore
+
+                        When calling setter the
+                        initial value which is null
+                           falls away
+                            |
+    const [activeIndex, setActiveIndex] = useState(null)
+
+
+
+
+
+
+
+/// useEffect in a functional component ///
+-useEffect allows us to write some code that our component is rerending and some pieces of information has changed
+
+   /// The useEffect Hook ///
+-Allows function components to use something like lifecycle methods.
+-We configure the hook to run some code automatically in one of three scenarios.
+    1.When the component is rendered for the first time only
+
+            useEffect(()=>{
+                console.log('yoooh')
+            }, []);
+
+    2.When the component is rendered for the first time and whenever it rerenders
+
+             useEffect(()=>{
+                 console.log('yoooh')
+             });
+
+    3.When the component is rendered for the first time and whenever it rerenders and some piece of data has changed.
+
+               useEffect(()=>{
+                   console.log('yoooh')
+               }, [term]);
+
+
+
+  //// Making a request using useEffect ////
+-We have ways we can make a REQUEST using ASYNC AWAIT inside a useEffect function.
+
+  1.By putting a helper function as async await inside our useEffect then call it at the end
+
+          useEffect(()=>{
+            const  search = async () => {   //making the request
+               await axios.get('https://semantic-ui.com/')
+            }
+            search()                          //calling the async await
+          },[term]);
+
+  2.By removing the function name and putting a set of paranthesis at the start and the end and another set of paranthesis at the end to call the function
+
+              useEffect(()=>{
+                  (async () => {
+                   await axios.get('https://semantic-ui.com/')
+                  })();
+              },[term]);
+
+  3.By using a normal promise.
+
+                  useEffect(()=>{
+                        axios.get('https://semantic-ui.com/')
+                            .then(()=>{
+                                console.log(response.data)
+                            })
+                  },[term]);
+
+ -There is no difference in the three methods we just listed you just choose what's easier for you.
+
+
+
+
+//// XSS ATTACK IN REACT ////
+-This is where we accidently pick up some HTML from an untrusted source.
+-Only time we make use of dangerouslySetInnerHTML={{__html}} to take a string and render it as HTML you are opening up yourself for a risk unless you are confident that the person sending you that HTML can be trusted
+
+
+                //// THROTTLING API REQUEST  ////
+-We throttle API request so that we don't call the API everytime a value is changed in the input
+-When trying to throttle an api request someone can uses a setTimeOut.
+-Everytime we use setTimeOut there is an ID we are given by the browser we can use the ID to cancel the setTimeOut
+
+const timeOutId=setTimeOut(()=>{
+ console.log('Hi there')              ///The browser gives us an ID
+},10000)
+
+
+clearTimeOut(timeOutId)   //This cancels the setTimeOut
+
+    //// useEffect CLEANUP FUNC ////
+-With useEffect we can return one function that is used to clean up request.
+-When we return the clean up function the first time react is gonna put a handle on it and it won't call it till when useEffect rerenders then it will be called first before any content inside the useEffect func.
+
+   useEffect(()=>{
+
+   console.log('Initial render or term was changed')
+
+   return () =>{
+     console.log('Clean Up')
+   }
+   })
+               ^
+               |
+     Showing how the code above works
+1.Func provided to useEffect is called when our component renders
+2.We return a cleanup function and react is gonna hold up to that cleanup function
+3.When our component rerenders and our term piece of state has changed we are gonna first invoke the cleanup function
+4.Then immediately after that the function provided to our useEffect is called the again
+
+-We can also remove an event listener in react
+To remove an event listener in React:
+
+ 1.Add the event listener in the useEffect hook.
+ 2.Return a function from the useEffect hook.
+ 3.Use the removeEventListener method to remove the event listener when the component unmounts.
+
+ more on this check link
+  https://bobbyhadz.com/blog/react-remove-event-listener#:~:text=Add%20the%20event%20listener%20in,listener%20when%20the%20component%20unmounts.
+
+
+
+/// LISTENING FOR EVENT HANDLERS TO ELEMENTS THAT AREN'T CREATED BY A COMPONENT  ///
+-In react it's kinda hard to listen to event handlers  that are not inside a particular component.
+-For instance we may have a dropdown menu, but we want to listen for CLICK in the BODY to close the dropdown.
+-This is hard cause the BODY tag isn't inside the component that makes the dropdown to show
+-Therefore we make use of useRef Hook that shows us whether a certain element is inside our component and if it's not we choose how to use it
+
+1.We Import useRef and call it inside our component
+   import React,{useState, useEffect,useRef} from "react";
+       const [open,setOpen]=useState(false)
+       const ref=useRef()
+
+2.We use useRef to the most parent element
+         <div ref={ref} className="ui form">
+           <div className="field">
+             <label className="label">Select a Color</label>
+             <div
+                 onClick={()=>setOpen(!open)}
+                 className={`ui selection dropdown ${open ? 'visible active':''}`}>
+               <i className="dropdown icon"></i>
+               <div className="text">{selected.label}</div>
+               <div className={`menu ${open ? 'visible transition':''} `}>{renderedOptions}</div>
+             </div>
+           </div>
+         </div>
+
+3.Then add some IF statement and choose what happens tho the body element that isn't inside our component
+       useEffect(()=>{
+           document.body.addEventListener('click',(event) => {
+               if (ref.current.contains(event.target)){
+                   return setOpen(true)
+               }
+               setOpen(false)
+           });
+       },[])
+
+
+
+
+
+
+
+
+                 ///////  useRef    ///////
+-useRef allows us to get a direct reference to a DOM element.
+-We get to use useRef when we want to get a reference to the most parent element of the component
+
+
+
+
+
+
+-When making post request with axios and we don't want to send any information to the body we add a third argument
+axios.post('https://google.com',{},{
+   params:{
+                   q:text,
+                   target:language.value,
+                   key:'AIzaSyCHUCmpR7cT_yDFHC98CZJy2LTms-IwDlM '
+   }
+})
+
+
+
+/// Reducing the Number of requests in API key ///
+-folder 12 video 61
+
+
+
+
+  //// Navigation in  React ////
+-When we are trying to find which location we are at on our url we use
+  window.location and the most important thing we look for there is the urls pathname
+-To search on which url route we are at we use
+
+ window.location.pathname === '/'
+ for home pages
+
+ window.location.pathname === '/list'
+ for other pages depending on the component we want to show
+
+-In most cases we build a reusable route component to avoid code repetition for instance:
+
+   const Route   = ({path, children}) => {
+     return window.location.pathname === path ? children : null;
+   }
+
+   export default Route
+
+-Above is a component we create to know on which PATH we are going and which CHILDREN component we pass as props.
+-To make use of the component we simply call it on our app.js file as:
+       return (
+           <div>
+               <Route path="/accordion">
+                   <Accordion items={items}/>
+               </Route>
+           </div>
+          )
+-The path is '/accordion' and the children component is <Accordion/>
+
+
+
+  /// CHANGING URL AND CONTENT OF THE PAGE WITHOUT MAKING MANY UNNECESSARY REQUEST ///
+  
+-When making an anchor tag of navigation and passing href inside it this causes the content of the site and the url to change but the problem is the site completely refreshes, and we get unnecessary request that can cause the site to hang a bit.
+-So the remedy to this is to:
+
+{1}.Create a <Link> tag component that we can call instead of the <a> tags
+{2}.Change the URL but don't do a full page refresh
+   -To prevent a full page refresh we are going to use a function
+    that is directly built into the browser
+        const onClick = (event) => {
+          event.preventDefault()
+
+          window.history.pushState({},'','/translate') //THE FUNCTION
+        }
+{3}.Each Route could detect the URL has changed
+{4}.Route could update piece of state tracking the current pathname
+{5}.Each Route rerenders,showing/hiding components appropriately.
+
+/// REMOVING A CALLBACK FUNCTION ///
+-Anytime we see one argument, and we pass it directly through the same order to another function this is a sign we can do a little refactor
+
+  onVideoSelect={(video)=>setSelectedVideo(video)}
+
+-We pass the video argument into setSelectedVideo as an argument again we can refactor this by removing the argument and the arrow function to keep the code cleaner
+
+   onVideoSelect={setSelectedVideo}
+
+
+   //// OVERVIEW ON CUSTOM HOOKS ////
+
+1. This is one of the best ways to create reusable code in a React project besides using components.
+2. We are always going to create custom hooks by extracting some hook-related code out of an existing functional component.
+  -We usually in custom hooks not talking about jsx code but the data related stuff on top of the component. If we wanted the jsx we could just create another component.
+3. Custom hooks always make use of at least one primitive hook internally
+4. Each custom hook should have one purpose
+5. Building a custom hook is kinda challenging, and you need to practice for you to get the concept.
+6. Data-fetching is a great thing to try to make a reusable code.
+
+
+these are the steps that we're going to use for creating reusable hooks
+
+1. other than jsx, identify each line of code related to some single purpose
+2. identify the inputs to that code
+3. identify the outputs to that code
+4. extract all of the code into a separate function, receiving the inputs as arguments and returning the outputs
+
+for fetching logic, we usually go through line by line identifying the purpose of each non jsx code in App and put all the code related to the video in a separate file
+
+-We are usually supposed to have an input so as we can give outputs on our hook function
+
+
+/////       DEPLOYMENT          ////
+
+
+create react app contains a deployment bundle which requires a couple different files to run our project in the browser e.g index.html, index.css, bundle.js
+
+
+these are static files that are used in the actual deployment where they'll be hosted
+
+
+this is cheap and efficient compared to running something like a node server
+
+
+
+
+/////           INTRO TO REDUX          /////
+
+
+redux is a state management library which makes creating complex apps easier. rather than managing state in react components, we're going to extract it to redux
+
+
+you can create applications with react alone but with redux it makes it even more easier especially in the case of a complex application
+
+
+it is not required to create a react app and not explicitly designed to work with react
+
+
+      /// REDUX CYCLE ///
+
+   ACTION CREATOR -> ACTION -> DISPATCH -> REDUCERS -> STATE
+
+      A-A-D-R-S
+
+         1.Action Creator
+This is a function that is going to create or return a plain javascript object.
+
+         2.Action
+The purpose of an action is to describe some change that we want to make to the data of our application.
+
+         3.Dispatch
+This is going to take in an action and going to make copies of the object and pass it off to a bunch of different places on our application.
+
+         4.Reducers
+This is a function that is responsible for taking in an action and some existing amount of data. it's going to process that action and make some changes to the data then return it.After that it can be centralised in some other location
+
+        5.State
+This is a central repository of all information that has been created by our reducers
+
+
+ //// REACT-REDUX ////
+
+To install react redux we use
+ npm install --save redux react-redux
+
+
+
+
+There is a system called the context system which enables communication between parent and  child even if there are other components between them)
+
+
+
+
+
+when exporting action creators on your app we don't use a default export but instead we use a named export that is:
+
+  export const selectSong = (song) => {
+    //Return an action
+      return {
+          type:'SONG_SELECTED',
+          payload:song
+      }
+  }
+
+Named export allows us to export many different functions from a single file
+
+
+
+To import a named export we pass in curly bracels when doing that
+
+import {selectSong} from "../actions";
+
+
+
+
+
+
+
+When writing code for a reducer, this is normally a function that accepts two arguments some existing amount of data  and an action argument
+
+const selectedSongReducer = (selectedSong=null,action) => {
+  if (action.type === 'SONG_SELECTED'){
+      return action.payload
+  }
+  return selectedSong
+}
+
+
+And when trying to export our reducer we first import combineReducer from redux add in our different reducers to our combineReducer then export it
+
+import { combineReducers } from 'redux'   //importing it
+
+
+export default combineReducers({
+    songs:songReducer,                 //Exporting our different reducers
+    selectedSong:selectedSongReducer
+})
+
+
+
+
+
+
+
+We should try and make the PROVIDER tag on top of our app hierarchy, and thus we add some code on our  src/index.js by importing some things in our index.js
+
+
+import React from "react";
+import { createRoot } from 'react-dom/client';
+import {Provider} from "react-redux";
+import {createStore} from "redux";
+
+import App from "./components/App";
+import reducers from "./reducers";
+
+const container = document.querySelector('#root')
+const root = createRoot(container)
+
+root.render(
+    <Provider store={createStore(reducers)}>
+        <App/>
+    </Provider>
+)
+
+When we make use our react-redux library we don't usually mess around with store directly instead we pass it to our provider and it takes care of everything
+
+
+
+
+
+
+
+
+
+
+There is an import in the react redux library called connect and as the name suggest it connects between our app with the provider
+
+To make use of connect we first import it:
+
+ import { connect } from "react/redux"
+
+notice how connect is in small letters
+
+
+
+then we export it by
+
+export default connect () (SongList)
+
+the first argument calls the function and the second one invokes it
+
+
+
+
+
+
+
+To configure our app by connecting our connect to our provider we use a function called mapStateToProps
+
+This name is just a convention and we can call it any other name but mostly people choose to call it mapStateToProps
+
+This function accepts an argument which is state that helps us get hold of all our data in our redux store
+
+const mapStateToProps = (state) => {
+ console.log(state)
+  return state
+}
+
+
+Then if we want to call our function we pass it in as an argument to our export default connect and that is:
+
+export default connect(mapStateToProps) (SongList)
+
+
+
+
+
+
+
+
+The mapStateToProps functions will always have an object and for us to call it we will always have to pass in an object and inside it the key that we want it to be shown:
+
+const mapStateToProps = (state) => {
+  return {songs:state.songs}
+}
+
+
+this should be the same as this.props on our main class based function so as to be able to invoke it and show it on our app
+
+
+
+
+
+
+
+If we want to pass in our action creator for it to show in our application first we have import it
+
+  import {selectSong} from "../actions"
+
+Notice how we imported it with curly braces that's cause the action creator is a named export
+
+
+Then to call it we pass it in on to the bottom of our export inside our creator with curly braces
+
+export default creator(mapStateToProps,{selectSong}) (SongList)
+
+
+We call our action creator at the bottom of our page to tell redux this is
+an action creator cause Redux does not automatically detect a function returning an object that it is an 'action'.
+
+
+The connect function that we pass our action creator into it will automatically will take the action and pass it in into our dispatch function for us.
+
+
+
+Before redux the App component is what we used to pass in a lot of config into our different components but with redux the ability to change data is being passed on by the components to change themselves.
+
+
+
+
+
+When we pass in a set of parentheses () to our action creators inside a component that we want to show on the screen.This will cause the action creator to be shown the first time the component is shown on the screen and thats not we want sometimes
+
+
+
+
+
+
+
+
+
+
+  /// Tricking redux with dummy reducers ///
+
+When creating a redux app first you may not have a reducer so people make a dummy reducer to trick the app so that it can stop displaying an error.
+
+  import { combineReducers} from 'redux'
+
+  export default combineReducers({
+      replaceMe:()=>'hi there'              // a dummy reducer
+  })
+
+
+
+
+
+
+
+  /// GENERAL DATA LOADING WITH REDUX ///
+
+1.Components gets rendered onto the screen
+
+2.Component's 'componentDidMount' lifecycle method gets called
+
+3.We call action creator from 'componentDidMount'
+
+4.Action creator runs code to make an API request
+
+5.API responds with data
+
+6.Action creator returns an 'action' with the fetched data on the 'payload' property
+
+7.Some reducer sees the action, returns the data off the 'payload'
+
+8.Because we generated some new state object,redux/react-redux cause our React app to be rerendered
+
+
+             1-3
+Components are generally responsible for fetching data they need by calling an action creator
+
+            4-6
+Action creators are responsible for making API requests
+This is where Redux-Thunk comes into play
+
+           7-8
+We get fetched data into a component by generating new state in our redux store,then getting that into our component through mapStateToProps
+
+
+
+
+
+
+
+
+
+
+   /// Understanding async action creators ///
+
+Sometimes we create our own folder of Axios, so we can make request
+
+  import axios from "axios";
+
+  export default axios.create({
+      baseURL:'https://jsonplaceholder.typicode.com'
+       //we make the base url so we don't have to specify everytime we wanna make a request
+  })
+
+
+Then this folder we pass it in to our action creator, so we can make the request
+
+
+  import jsonPlaceholder from "../apis/jsonPlaceholder";
+
+
+  export const fetchPosts = async () => {
+  ///BAD CODE
+   const response=await jsonPlaceholder.get('./posts')
+
+    return{
+        type:'FETCH_POSTS',
+        payload:response
+    }
+  }
+
+
+
+The code above is going to bring up an error message saying
+//Actions must be plain objects.Use custom middleware for async action
+
+
+We get this error message cause of:
+
+1.Action creators must return plain JS objects with a type property and we are not doing that.
+
+The async code that we have just written for it to run in the browser it's going to be transpired to es-2015 and it will bring up this code in the browser
+
+  export const fetchPosts = async () => {
+  case 0:
+   return jsonPlaceholder.get('./posts')     ct
+
+   case 1
+    return{type:'FETCH_POSTS',payload:response}
+  }
+
+
+We get this code because it's an async function and we are not returning a JS object in case 1 thus it will run the error
+
+
+
+
+
+2.If we try to use promise instead of async function,by the time our action gets to a reducer,we won't have fetched our data
+
+
+The redux process of getting data and going from
+
+ action creator called -> action returned -> action sent to all reducers -> reducers run
+
+This process happens instantaneously and if we are making request using a promise it takes some time.
+
+So by the time we get a response from the promise the redux process would have already ended and we won't get any data
+
+
+
+ /// MIDDLEWARES IN REDUX ///
+-We have two types of action creators
+
+1.synchronous action creator -> instantly returns an action with data
+2.asynchronous action creator -> Takes time to get its data
+
+-When we have an action creator that makes a request we use an asynchronous action creator
+
+
+ What is a middleware?????
+
+This is a plain JS function that gets called with every action we dispatch
+
+Inside that function it has the ability to STOP,MODIFY, or otherwise mess around with actions
+
+There are tons of open source middleware and the most popular use of it is to deal with async action e.g Redux-Thunk
+
+
+
+
+
+When we want to apply redux thunk on our app we add some syntax on our  main index.js
+
+ import thunk from "redux-thunk";
+ import {applyMiddleware} from 'redux'
+
+
+ // add the applyMiddleware and thunk inside the parenthesis
+
+ const store=createStore(reducers,applyMiddleware(thunk))
+
+ root.render(
+     <Provider store={store}>
+         <App/>
+     </Provider>
+ )
+
+
+
+
+
+
+
+
+
+When making use of redux thunk we add some code on our action creator
+
+ export const fetchPosts = () => {
+
+  return async (dispatch) =>{
+      const response=await jsonPlaceholder.get('./posts')
+
+      dispatch({  type:'FETCH_POSTS', payload: response})
+  }
+
+ }
+
+
+The most important things are
+
+ 1.we return a function with async and an argument of dispatch and sometimes with state
+
+2.instead of returning an object with type and payload like we always do we put the object inside dispatch()
+
+
+
+
+
+
+
+
+
+  //// RULES OF REDUCERS ////
+
+1.Must return any value besides 'undefined'
+
+You can as much as put up a dummy reducer or return any value than returning nothing inside your reducer cause it will run an error in your app
+
+
+
+2.Produces 'state', or data to be used inside of your app using only previous state and the action
+
+Reducers usually have two arguments
+
+                            Previous state      action
+                                |                  |
+const selectedSongReducer = (selectedSong=null , action)
+
+
+
+
+3.Must not reach 'out of itself' to decide what value to return (reducers are pure)
+
+ What we mean by reducers are pure is anytime we call a reducer with an action and our previous state value we shouldn't reach out of the reducer to try and make summ api request or do anything outside our reducer
+
+
+4.MISLEADING>> Must not mutate its input 'state' argument
+
+
+the 4th rule is extremely misleading and possibly even false. this is because you can mutate the state and not get errors. it is easier to tell beginners not to mutate state than to tell them when they can or can't mutate state
+
+
+an easier way is to say never update the state, return a new updated state as a new variable. check screenshots to see different ways you can return new variables while updating state (video 20/8)
+
+
