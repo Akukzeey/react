@@ -1130,6 +1130,414 @@ const selectedSongReducer = (selectedSong=null , action)
 the 4th rule is extremely misleading and possibly even false. this is because you can mutate the state and not get errors. it is easier to tell beginners not to mutate state than to tell them when they can or can't mutate state
 
 
-an easier way is to say never update the state, return a new updated state as a new variable. check screenshots to see different ways you can return new variables while updating state (video 20/8)
+an easier way is to say never update the state, return a new updated state as a new variable. check screenshots to see different ways you can return new variables while updating state (video 19/8)
+
+
+
+
+we can change the state without mutating but this will mostly create another object or array when changing them
+
+  //ARRAYS
+
+1.Adding elements inside an array
+
+ const colors =['blue','red']
+
+ [...colors,'green']
+
+ //  ['blue','red','green']
+
+
+
+ [...colors,'green'] === colors
+
+ //false
+
+ This is false cause the reference number isn't the same when adding the element 'green' this will create a new array
+
+
+
+
+2.Removing elements inside an array
+
+  const colors =['blue','red']
+
+  colors.filter(color !== 'red')
+
+  // ['red']
+
+
+  colors.filter(color !== 'red') === colors
+
+  //false
+
+  This also false cause the reference number isn't the same and it will return a brand new array
+
+
+
+// Object
+
+1.Updating property in an object
+
+ const profile ={name:'sam'}
+
+ {...profile,name:'alex'}
+
+
+
+2.Adding a property to an object
+
+const profile ={name:'sam'}
+
+ {...profile,age:30}
+
+
+ {name:'sam',age:30}
+
+
+
+
+
+
+
+
+
+
+
+In our reducers mostly people use switch statements to find the type of the reducer.Sometimes we have many types and we want put it in one single reducer it's still advisable to do that
+
+   export default = (state=[],action) =>{
+      switch (action.type) {
+        case 'FETCH_POSTS':
+           return action.payload;
+        default:
+           return state;
+      }
+
+   }
+
+
+
+
+
+
+
+
+
+
+The find statement is a built-in JS method that helps us a find a particular element.
+
+const colors=['blue','red']
+
+colors.find(colors=>colors==='blue')
+
+//'blue'
+
+
+
+
+
+
+
+
+
+
+
+
+It is a good practise especially for reusability purpose to put all the computations that we do on our redux state on the mapStateToProps function for example
+
+
+class UserHeader extends React.Component{
+
+    componentDidMount() {
+        this.props.fetchUser(this.props.userId)
+    }
+
+    render() {
+
+        const user = this.props.users.find(user => user.id === this.props.userId)
+
+         // we have this variable that helps get the user Id but we wanna make it reusable so it's best we put it in our mapStateToProps
+
+        if (!user) return null
+
+        return(
+            <div className="header">
+                {user.name}
+            </div>
+        )
+    }
+}
+
+
+
+
+
+const mapStateToProps (state,ownProps) =>{
+
+ return {user:state.users.find(user=>user.id === ownProps.userId)}
+
+ //The code right now is reusable and we can put it in our class function as
+};
+
+
+
+
+
+class UserHeader extends React.Component{
+
+    componentDidMount() {
+        this.props.fetchUser(this.props.userId)
+    }
+
+    render() {
+
+        const {user} = this.props
+
+        if (!user) return null
+
+        return(
+            <div className="header">
+                {user.name}
+            </div>
+        )
+    }
+}
+
+
+
+
+
+
+
+
+
+
+Sometimes there comes an instance where a network request is sent and for some reason the network request is sent multiple times and this is not something good.
+
+There are ways where we can get through instances like this if they occur
+
+1.Using memoizing functions
+
+ Memoize is a built-in function from lodash.com that gives us some helper function that helps us use in our application
+
+ example:
+
+  We have a user that fetchs request from some API
+
+         function getUser (id) {
+             fetch (id);
+             return 'Made a request'
+         }
+
+         getUser(2)   //calling the function
+
+         https://lodash.com/docs/2      //request is made the first time
+             made a request
+
+
+
+         getUser(2)   //calling the function the second
+
+           https://lodash.com/docs/2    //request is made the second time
+               made a request
+
+
+    This is not good practice to do instead we want the function to be run but not fetch the user again
+
+    To get through this we use the memoizing function
+
+
+
+
+    const memoizedGetUser = ._memoize(getUser)
+
+
+    memoizedGetUser (2)
+
+    https://lodash.com/docs/2
+                                     //request is made the first time
+     'made a request'
+
+
+     memoizedGetUser (2)
+                                 // request made
+     'made a request'
+
+
+
+    The func memoizedGetUser runs the second time but we don't fetch the user the second time.So to avoid what happened with our function getUser we can use memoize to get through it
+
+
+
+
+
+
+
+
+ To install lodash in our app so we can use memoize
+
+  npm install --save lodash
+
+
+  With memoize you have to really know how to call that function and where to call function to avoid fetching the request many time
+
+  first:
+
+        import _ from 'lodash'
+
+
+
+  second:
+
+
+  Our function that was calling the fetchUser
+
+       export  const fetchUser = (id) => async dispatch =>{
+           const response =await jsonPlaceholder.get(`/users/${id}`)
+           dispatch ({type:'FETCH_USER',payload:response.data})
+       }
+
+
+
+  Create a separate function that's going to call your memoize and refactoring your previous code
+
+      export const fetchUser = (id) =>dispatch=>{
+        _fetchUser(id,dispatch)
+      }
+
+     import _fetchUser = _.memoize(async(id,dispatch)=>{
+       const response =await jsonPlaceholder.get(`/users/${id}`)
+       dispatch ({type:'FETCH_USER',payload:response.data})
+     })
+
+
+
+ We can simplify the code even more by putting the fetchUser function in one line
+
+     export  const fetchUser = (id) => async dispatch => _fetchUser(id,dispatch)
+     const _fetchUser = _.memoize(async(id,dispatch)=>{
+         const response =await jsonPlaceholder.get(`/users/${id}`)
+         dispatch ({type:'FETCH_USER',payload:response.data})
+     })
+
+
+Memoize is a good solution but the problem is the code is about weird and if something in the fetchUser changes we can't really get the update
+
+NOTE :: The func _fetchUser is called with the underscore so people can only change it if they know what they are doing
+
+
+
+
+2.Using action creators inside of an action creator
+
+
+When passing in an action creator inside of an action creator we need to know that the inside action creator should be inside of dispatch paranthesis so as for it to be inside redux-thunk and to be invoked by dispatch that is:
+
+//Outer action creator
+export default fetchPostsAndUsers = () => async dispatch => {
+  dispatch(fetchPosts())             //fetchpost is an action creator
+}
+
+
+
+//Inner action creator
+export const fetchPosts = () =>  async dispatch =>{
+     const response=await jsonPlaceholder.get('./posts')
+     dispatch({  type:'FETCH_POSTS', payload: response.data})
+ };
+
+
+
+
+If the inside action creator has an async function and if we pass it in inside another action creator we should wait for the inner action creator to complete and fetch all the appropriate data before we invoke our outer action creator
+
+so to do so we have to pass in an await keywoard
+
+//Outer action creator
+ export default fetchPostsAndUsers = () => async dispatch => {
+  await dispatch(fetchPosts())             //await keywoard
+}
+
+
+
+//Inner action creator
+export const fetchPosts = () =>  async dispatch =>{
+     const response=await jsonPlaceholder.get('./posts')
+     dispatch({  type:'FETCH_POSTS', payload: response.data})
+ };
+
+
+
+
+
+Inside our action creators when you've called a certain API and it has fetched data for you,we can find the data inside our actions by using an argument that comes with redux-thunk called getState
+
+
+ export default fetchPostsAndUsers = () => async (dispatch,getState) => {
+
+  await dispatch(fetchPosts())
+
+  console.log(getState())
+
+}
+
+
+
+
+
+We may have some unique IDs that we want to get from our fetched results and we can do that by using lodash and its pretty easy and forward.
+
+We can try first by mapping through the data we just fetched and getting unique ids using lodash
+
+
+
+export default fetchPostsAndUsers = () => async (dispatch,getState) => {
+
+  await dispatch(fetchPosts())
+
+ const userIds= _.uniq(_.map(getState().posts.'userId'))
+
+}
+
+
+
+
+
+The main goal of this new action creator was for it not to run many times in each request when it could just run once in each request
+
+Now we have our unique Ids so we can just iterate over it
+
+
+
+export default fetchPostsAndUsers = () => async (dispatch,getState) => {
+
+  await dispatch(fetchPosts())
+
+ const userIds= _.uniq(_.map(getState().posts.'userId'))
+
+ userIds.forEach(id=>dispatch((fetchUsers(id)))
+
+}
+
+
+export  const fetchUser = (id) => async dispatch =>{
+    const response =await jsonPlaceholder.get(`/users/${id}`)
+    dispatch ({type:'FETCH_USER',payload:response.data})
+}
+
+
+
+The above action creator of fetchPostsandUsers will stop fetchUser to run unnecessary request many times
+
+
+
+
+
+
+
+
+
+
 
 
