@@ -1164,7 +1164,7 @@ we can change the state without mutating but this will mostly create another obj
 
   colors.filter(color !== 'red')
 
-  // ['red']
+  // ['blue ']   right
 
 
   colors.filter(color !== 'red') === colors
@@ -1509,7 +1509,7 @@ The main goal of this new action creator was for it not to run many times in eac
 Now we have our unique Ids so we can just iterate over it
 
 
-
+//Outer user
 export default fetchPostsAndUsers = () => async (dispatch,getState) => {
 
   await dispatch(fetchPosts())
@@ -1520,7 +1520,7 @@ export default fetchPostsAndUsers = () => async (dispatch,getState) => {
 
 }
 
-
+//Inner user
 export  const fetchUser = (id) => async dispatch =>{
     const response =await jsonPlaceholder.get(`/users/${id}`)
     dispatch ({type:'FETCH_USER',payload:response.data})
@@ -1561,6 +1561,513 @@ URL still changes
 BrowserRouter communicates the URL to Route components
 
 Route components rerender to show new set of components
+
+
+
+
+   ////  OAuth Authentication  ////
+
+User authenticates with outside service provider (Google,Linkedin,Facebook)
+
+User authorizes our app to access their information
+
+Outside provider tells us about the user
+
+We are trusting the outside provider to correctly handle identifaction of a user
+
+OAuth can be used for (1) user identification in our app and (2) our app making action on behalf of user
+
+
+
+
+          //// DIFFERENCE BTW OAuth FOR SERVERS AND
+          OAuth FOR JS BROWSER APPS ////
+
+ OAuth for servers Results in a 'token' that a server can use to make requests on behalf of the user and OAuth for JS browser apps also Results in a 'token' that a server can use to make requests on behalf of the user
+
+ OAuth for servers Usually used when we have an app that needs to access user data when they are not logged in and OAuth for JS brower Apps  usually used when we have an app that only needs to access user data while they are logged in
+
+ OAuth for Users is difficult to setup because we need to store a lot of info about the user and OAuth for JS browser apps very easy to set up thanks to Google's JS lib to automate flow
+
+
+
+
+ steps for setting up OAuth
+ - create a new project at console.developers.google.com
+
+ - set up an OAuth confirmation screen
+
+ - generate an OAuth client ID
+
+ - install google's API library, initialize it with the OAuth client ID
+    this is added through a script tag in our index.html body as :
+    <script src="https://apis.google.com/js/api.js"></script>
+
+ - make sure the lib gets called anytime the user clicks on the login with google button
+
+
+
+
+
+ Creating OAuth credentials
+
+-Create a new project at console.developers.google.com
+-Go to credentials and configure consent screen
+-Check the external radio button and press create button
+-Add your project name and add your email as well
+-After that go back to credentials and create new credential
+-Then go to OAuth client ID add what type of project you wanna create and take take the client ID
+
+
+
+
+after creating OAuth credentials we install google's API library, initialize it with the OAuth client ID this is added through a script tag in our index.html body as :
+<script src="https://apis.google.com/js/api.js"></script>
+
+
+
+After that we create a new component called GoogleAuth which is a class based component and add componentDidMount function and put
+window.gapi.load ('client:auth2') which is the Google api library we had just put in our index.html file
+
+
+
+
+Then we try and initialize the Google api library(gapi) by putting the client ID we just got from our OAuth credentials
+
+   componentDidMount (){
+     window.gapi.load ('client:auth2',()=>{
+
+         window.gapi.client.init({
+
+         clientId:'890276926888-vo1h636l5fccmbg0of3keeiet7urh6mg.apps.googleusercontent.com'
+
+         scope:'email'
+
+         })
+
+
+    })
+   }
+
+
+
+
+NOTE: We don't put paranthesis () on methods when we don't want the methods to be run the instance our component is rendered on the screen example
+
+
+       onSignIn = () =>{
+           this.auth.signIn()
+       }
+
+       onSignOut = () =>{
+           this.auth.signOut()
+       }
+
+
+         renderAuthButton(){
+                       <button onClick={this.onSignOut} className='ui red google button'>
+                       </button>
+
+                       <button onClick={this.onSignIn} className='ui green google button'>
+                           <i className="google icon"/>
+                           Sign In with Google
+                       </button>
+               }
+           }
+
+
+ We called the 2 methods without paranthesis cause we didnt want the to be run the instance our component is rendered on the screen
+
+
+
+
+
+
+
+
+We can add an initial value to our state in our reducer by defining it with CAPITAL LETTERS so other engineers will know that they shouldn't try to change the state
+
+
+const INITIAL_STATE = {         ///INITIAL VALUE OF STATE
+  isSignedIn:null;
+}
+
+
+export default (state=INITIAL_STATE,action)=>{
+  switch (action.type){
+    case 'SIGN_IN':
+    return {...state,isSignedIn:true};
+    case 'SIGN_OUT':
+     return {...state,isSignedIn:false};
+     default:
+      return state
+  }
+}
+
+
+
+
+
+
+
+
+
+
+///////////////////////
+REDUX DEV TOOLS
+///////////////////////
+
+
+we're going to install an extension to our browser that is going to allow us to have a look at the data inside our redux store easily
+
+
+this can be used to debug the redux store
+
+
+Redux DevTools by remotedevio (https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd?hl=en)
+
+
+install this from webstore then we'll hook up our app to this extension
+
+
+root index.js
+
+import {createStore, applyMiddleware, compose} from "redux";
+
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
+const store = createStore(reducers, composeEnhancers(applyMiddleware()))
+
+
+we don't have any middleware yet but we will eventually have redux thunk installed later. nonetheless we can still call applyMiddleware() without passing anything and not get an error
+
+
+we will open our browser and test this redux dev tools extension. you should see the extension icon light up
+
+
+clicking on it is going to expand the redux dev tools. you can open it as a window too
+
+
+localhost:3000?debug_session=nameOfTheSession
+
+running this on the browser is going to start a debug session which is going to save all data in redux store between page refreshes
+
+anytime your done with a debug session, remember to delete the query string
+
+
+
+
+
+
+
+///////////////////////
+REDUX FORM
+///////////////////////
+
+
+ apparently installing redux-form to the latest node and npm version causes an error when we run npm i redux-form
+
+ code ERESOLVE
+
+ npm ERR! ERESOLVE unable to resolve dependency tree
+
+
+ run this command instead
+ ~ npm install redux-form --legacy-peer-deps
+
+
+
+ upto this point in the course, we've been handling forms using controlled input elements and component level state management
+
+
+ using redux means this approach is going to change as we want to hold all our data in our redux store
+
+
+ our input element will have an onChange handler which will call an action creator, the action creator will be dispatched to the reducer and taken to the redux store
+
+
+ using mapStateToProps, the value from the store will be passed to the component as props and stored as the value
+
+
+ redux-form does the transferring data from the input element to the store and back to the input element automatically
+
+
+ we're not going to write any action creator, reducer nor mapStateToProps, redux form will do this for us
+
+
+ we can find some very useful examples of redux form from redux form documentation examples e.g simple form, client side validation form, submit validation form, initializing from state form i.e edit form, wizard form which has multiple stages of submitting
+
+
+ we're going to use a synchronous validation form example in this case
+
+
+
+
+  /// CONNECTION REDUX FORM WITH OUR APP ///
+
+To connect our redux form with our app first we add a import reducer that is already inside our redux form library
+
+
+import { reducer } from 'redux-form'
+
+
+export default combineReducer({
+    form:reducer                   // calling our redux-form reducer
+})
+
+
+Since we may have a lot of variables called reducer it is best practice to call the variable with another name so we can export it easily
+
+
+import { reducer as formReducer } from 'redux-form'
+
+export default combineReducer({
+    form:formReducer                   // calling our redux-form reducer
+})
+
+
+
+   /// Creating Forms with redux-forms ///
+
+To try and create a form on a particular component first we import a few things from redux-form
+
+ import { Field, reduxForm } from 'redux-form'
+
+
+
+
+When using reduxForm the variable we just imported using redux-form  the code we use is just like the code we use when we've imported { connect }  from 'redux'
+
+
+export default reduxForm({ form:'streamCreate' }) (streamList)
+
+
+By doing this when we call props on our component we will see many properties redux-form has created for us
+
+
+
+
+
+The field variable we just imported from our redux-form is some sort of input but it's not really an input.The field element accepts some props
+
+<form>
+<Field name='title' component={this.renderInput}/>
+<Field name='description' component={this.renderInput}/>
+</form>
+
+
+The name prop is to show the particular field has a specific name so we can't confuse it with another Field
+
+The component prop this can be a function or as it says a component that shows the input
+
+we will create a function called renderInput which we will pass to this component={} on our Field element. we will return a controlled input element from this function
+
+
+in order to make this a controlled element, we have to pass a prop to this function
+
+
+the prop that is passed to this function contains an input object which contains the name, value and some functions like onChange
+
+    renderInput(formProps){
+        return(
+            <input onChange={formProps.input.onChange} value={formProps.input.value}/>
+        )
+    }
+
+
+we can have a look at our redux devtools extension to note these updates on the state
+
+
+
+there is a much cleaner way of writing this renderInput function
+
+
+    return <input {...formProps.input} />
+
+
+this is going to destructure the input object and pass in all the key and value pairs as properties to the input element
+
+
+as a way of shortening this further, we can destructure input from the formProps object
+
+    renderInput({input}){
+        return(
+            <input {...input} />
+        )
+    }
+
+
+
+To customize our Form fields is just like customizing any other JSX block at the the moment our renderInput is just returning an input so we add a multi-line JSX block
+
+   renderInput({input}){
+          return(
+          <div className="field">
+            <label> </label>
+              <input {...input} />
+          <div>
+          )
+      }
+
+
+We currently don't have a label to be displayed on our app so we add it as a prop on our Field element by doing this the prop we just added will be added as a NEW property on our renderInput function
+
+  <Field name='title' component={this.renderInput} label="Enter Title" />
+  <Field name='Description' component={this.renderInput} label="Enter Description" />
+
+
+  renderInput({input,label}){
+      return(
+          <div className='field'>
+              <label>{label}</label>
+              <input {...input}/>
+          </div>
+      )
+   }
+
+
+
+
+
+   /// Handling Form Submission ///
+
+Redux-form come with a lot of its callback function when we console this.props.
+
+
+One of the callback function is called handleSubmit which handle form submission and we call it by
+
+ render (){
+   return(
+   <form onSubmit={this.props.handleSubmit}>
+   )
+ }
+
+
+This will prevent the default value of it refreshing when we submit the form.
+
+
+
+
+We also want to get the value which have been submitted from our input values to do that we add another function in this case will call ours onSubmit
+
+  onSubmit (formValues) {
+     console.log(formValues)
+  }
+
+
+
+After making that function we will pass it to our form element inside the redux-form handleSubmit callback function as its argument so as to get the values
+
+
+ render (){
+   return(
+   <form onSubmit={this.props.handleSubmit(this.onSubmit)}>
+   )
+ }
+
+
+
+
+
+
+When we don't enter any value on our inputs and we submit it we get an empty object and that's not good practice
+
+So cause of this we should try and validate our input values to see if the user has entered correct value or they haven't
+
+
+We pass in a function between our render function and our export default and that function is called validate that has an argument of form values
+
+ const validate = (formValues) =>{
+  const errors = {}
+
+  if(!formValues.title){
+    errors.title='You must enter a valid title'
+  }
+
+   if(!formValues.description){
+      errors.description='You must enter a valid description'
+    }
+
+    return errors
+ }
+
+
+ we will then wire this function to redux form on a key called validate
+
+ export default reduxForm({
+     form: 'streamCreate',
+     validate: validate
+ })(StreamCreate)
+
+
+ this function is going to be run when our form is initially rendered or when a user interacts with it with all the values from the form
+
+ if our error object has a property with the same name as the Field name, redux form is going to take that error message and pass it to the renderInput function of that Field
+
+
+ we will destructure meta in our renderInput method which contains the errors
+
+     renderInput({input, label, meta}){
+         return(
+             <div className="field">
+                 <label>{label}</label>
+                 <input {...input} />
+                 <div>{meta.error}</div>
+             </div>
+         )
+     }
+
+
+ this is now working, however we only want to show the error message when a user clicks onto a field, enters some text and then clicks out of it
+
+
+ the meta object contains a property called touch which is a boolean
+
+
+ we will create a helper function called renderError which is going to be passed the meta object
+
+
+ running this is going to cause an error due to this which we can solve by converting renderInput to an arrow function
+
+     renderError = ({error, touched}) =>{
+         if (error && touched){
+             return(
+                 <div className="ui error message">
+                     <div className="header">{error}</div>
+                 </div>
+             )
+         }
+     }
+
+     renderInput = ({input, label, meta}) => {
+         console.log(meta)
+         return(
+             <div className="field">
+                 <label>{label}</label>
+                 <input {...input} />
+                 <div>{this.renderError(meta)}</div>
+             </div>
+         )
+     }
+
+ this is now working well, the error div is added to the screen however semantic ui is hiding the error by giving it a style of display none
+
+
+ this can be fixed by adding a class error to the form
+
+ className="ui form error"
+
+///////////
+////NOTE///
+///////////
+WHENEVER WE GET AN ERROR OF CANNOT READ PROPERTY OF UNDEFINED MOSTLY IS CAUSE OUR ELEMENT WHICH IS INSIDE A PARTICULAR FUNCTION CANNOT BE ACCESSED OUTSIDE THAT PARTICULAR FUNCTION
+
+
+
+
+
+
+
+
 
 
 
