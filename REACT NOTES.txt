@@ -8618,8 +8618,7 @@ because we're now creating our own history object, we're no longer going to crea
 
 inside src, create a file called history.js
 
-import { createBrowserHistory } from 'history';
-
+import { createBrowserHistory } from "history";
 export default createBrowserHistory();
 
 
@@ -8651,17 +8650,23 @@ export const CustomRouter = ({basename, children, history}) => {
 anytime we pass history as a prop, the router is going to use this instead of its default history object
 
 
-we will then replace BrowserRouter with CustomRouter in index.js
+we will then replace BrowserRouter with CustomRouter in our app.js
 import {CustomRouter} from "./CustomRouter";
 import history from "./history";
 
-root.render(
-    <Provider store={store}>
-        <CustomRouter history={history}>
-            <App/>
-        </CustomRouter>
-    </Provider>
-)
+const App = () => {
+    return(
+        <div className='ui container'>
+           <CustomRouter history={history}>
+               <Header/>
+               <Routes>
+             <Route path='/streams/delete' exact element={<StreamDelete/>}/>
+             <Route path='/streams/show' exact element={<StreamShow/>}/>
+            </Routes>
+           </CustomRouter>
+        </div>
+    )
+}
 
 we will then import history in our action creators file
 

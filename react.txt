@@ -683,7 +683,11 @@ this is cheap and efficient compared to running something like a node server
 /////           INTRO TO REDUX          /////
 
 
+///new redux installation
+npm install @redux/toolkit
+
 redux is a state management library which makes creating complex apps easier. rather than managing state in react components, we're going to extract it to redux
+
 
 
 you can create applications with react alone but with redux it makes it even more easier especially in the case of a complex application
@@ -2059,7 +2063,218 @@ We pass in a function between our render function and our export default and tha
 ///////////
 ////NOTE///
 ///////////
-WHENEVER WE GET AN ERROR OF CANNOT READ PROPERTY OF UNDEFINED MOSTLY IS CAUSE OUR ELEMENT WHICH IS INSIDE A PARTICULAR FUNCTION CANNOT BE ACCESSED OUTSIDE THAT PARTICULAR FUNCTION
+WHENEVER WE GET AN ERROR OF CANNOT READ PROPERTY OF UNDEFINED MOSTLY IS CAUSE OUR FUNCTION WHICH IS INSIDE A PARTICULAR ELEMENT  CANNOT BE ACCESSED OUTSIDE THAT PARTICULAR FUNCTION
+
+
+
+
+///new redux installation
+npm install @redux/toolkit
+
+
+
+
+
+//////////////////////
+REST BASED REACT APPS
+//////////////////////
+
+
+our StreamCreate form is now complete. we now need to think what to do when a user finally submits the create stream form
+
+
+we need to think of how to reach to the api server that will be storing a list of all the streams broadcasting
+
+
+the api server is going to have a list of streams. each stream will have an id, title and description
+
+
+when a user selects a stream, the id will be taken to the RMTP server which is going to connect them to the streamers computer of the same id
+
+
+we need to work on the api server before we can progress further with our app
+
+
+we're going to use a package called json-server which uses REST conventions
+
+
+open another terminal window and go to streams directory where we will create a second project folder which will contain code for the json-server api. these are going to be two completely separate servers
+
+
+create a new folder called api and cd into it
+
+
+run npm init and accept all by pressing enter and we will have a package.json file
+
+
+we can now install json-server
+~ npm i json-server
+
+
+we can create a db.json file then any record that we store to this api server will be automatically stored inside this file
+
+
+inside api, create a new file called db.json and add some json to it
+
+{
+    "streams": []
+}
+
+
+as we start to create some streams in our app, they're going to be added as json records in this array
+
+
+we're then going to open our package.json file, delete the test script and write a start up script
+
+  "scripts": {
+    "start": "json-server -p 3001 -w db.json"
+  },
+
+this is going to start the server on port 3001 and it is going to watch db.json for any changes that get made to it
+
+
+run npm start and thats basically all we need to do to start our server
+
+
+now we can make rest calls to localhost:3001/streams
+
+
+
+
+
+
+
+
+Sometimes we need to connect our connect function which connects our app to our redux store with redux form and that is easy
+
+
+import {connect} from "react-redux";
+import {createStream} from "../../actions";
+
+
+
+
+
+
+
+const formWrapped = reduxForm({
+                        form:'streamCreate',
+                        validate:validate}) (StreamCreate)
+
+export default connect (null,{createStream}) (formWrapped)
+
+
+
+
+
+
+To check if our stream is created we will get a network request on our terminal on our fetch/XHR
+
+
+then we will make a new terminal on our code editor check our api folder go to the db.json file we created and run command
+
+//cat db.json
+
+
+
+ /// TYPES OF RESTFULL CONVENTIONS AND THEIR RESPONSE ///
+
+ ACTION         METHOD             ROUTE             RESPONSE
+
+List all         GET               /streams         Array of records
+ records
+
+Get one          GET               /streams/:id     single record
+particular
+record
+
+Create record     POST             /streams          Single record
+
+Update a record   PUT              /streams/:id      Single record
+
+Delete a record    DELETE          /streams/:id      Nothing
+
+
+
+
+
+
+
+
+
+
+
+        //// OBJECT BASED REDUCERS ////
+
+Changing a object based state is easier than changing an array based state in a reducer
+
+ export default (state={},action) =>{
+ switch (action.type){
+   case EDIT_STREAM :
+     return {...state, [action.payload.id]:action.payload };
+
+         // the [action.payload.id] is not a string this is a key interpolation that gets a key from somewhere else
+
+    default:
+     return state;
+
+ }
+ }
+
+
+
+
+
+Deleting a object based state is a lil bit different as well than changing object based state
+
+With deleting an object based state first we install lodash then we call its built in function _.omit which is gonna delete the object without changing its original value so we don't have to spread our state.
+
+   export default (state={},action) =>{
+   switch (action.type){
+     case EDIT_STREAM :
+       return _.omit(state,action.payload);
+             //we called the _.omit with brackets and didnt spread the state
+      default:
+       return state;
+
+   }
+   }
+
+
+
+
+
+Merging a list of records is also kinda different from changing object based state or editing object based state or even merging one record
+
+Here we gon use a built in lodash function as well that is _.mapkeys.This function that is going to take an array an return an object with the items of the array being the values of this object
+
+                                                                        mapKeys(streams,'id') will create an object with the ids from each stream as the keys
+
+
+
+      export default (state={},action) =>{
+      switch (action.type){
+        case EDIT_STREAM :
+          return {...state, ..._.mapkeys(action.payload, 'id')}
+         default:
+          return state;
+
+      }
+      }
+
+
+
+
+
+
+
+
+
+
+
+
+
+There is a built in Javascript method called Object.Values(obj).This method takes in an object as argument and it turns it into an array
 
 
 
@@ -2075,5 +2290,114 @@ WHENEVER WE GET AN ERROR OF CANNOT READ PROPERTY OF UNDEFINED MOSTLY IS CAUSE OU
 
 
 
+
+
+In our action creator when we are using redux thunk we can easily access our store.
+
+We have two arguments we pass in on redux thunk mostly we use (dispatch) but there is another argument called (useState)
+
+export const createStream = formValues => async (dispatch,getState) => {
+    const {userId} = getState().auth
+
+     //Here we are removing a property from auth which we access it by using getState()
+
+    const response = await streams.post('/streams', {...formValues,userId})
+    dispatch({type: CREATE_STREAM, payload: response.data})
+};
+
+
+
+
+
+
+
+
+
+
+
+
+   //// NAVIGATION ///
+
+There are two types of navigation
+
+1.Intentional Navigation
+This is where a user clicks on 'Link' component and he is taken to another page
+
+
+2.Programmatic Navigation
+This refers to when a user is redirected as a result of an action that occurs on a route
+
+
+
+
+  /// When to Navigate Programmatic Navigation ///
+
+1.User Submits the form
+2.We make request to backend API to create the stream
+3.Time passes
+4.API responds with success or error
+5.We either show error to the user or navigate them back to list of streams
+
+
+
+
+
+
+ //// CREATING A BROWSER ROUTER OBJECT ////
+
+When making use of react-router we get an import called browser-router.
+
+Browser router helps us to change the URLs by react-router creating summ called history that changes our urls.
+
+To get hold of history is kinda hard so it makes it harder to make use of programmatic navigation so to get through this we create our own HISTORY called BROWSER HISTORY
+
+
+
+
+
+
+
+
+  //// EDIT STREAM ////
+
+we're now going to work on the edit stream button. this will allow a user to edit the title or description of a stream they had created
+
+
+we can use two approaches to communicate the stream that the user is trying to edit
+
+1. selection reducer - when a user clicks on a stream to edit it, use a selectionReducer to record what stream is being edited
+2. url based selection - put the id of the stream being edited in the URL
+
+
+we're going to use url based selection which will work for edit, show and delete
+
+
+we can make use of react router dom, we will look at the url and pull of the id portion of the url. we will pass this as a prop to the StreamEdit component
+
+
+first we're going to update our edit stream button to make sure the id of the stream is passed to the url
+
+
+StreamList, renderAdmin()
+
+    <Link to={`/streams/edit/${stream.id}`} state={{ streamId: stream.id }} className="ui button primary">Edit</Link>
+
+state is going to pass the id into the history object which we will use to access the id
+
+
+then we're going to do a little tweak around our routing tools to support url based selection
+
+App.js
+
+    <Route path="/streams/edit/:id" element={<StreamEdit/>}/>
+
+
+
+
+////////
+NOTE //////
+////////
+
+   With React-Router,each component needs to be designed to work in Isolation (fetch its own data) we cant assume that a particular component loads up data that might have been loaded up previously our application
 
 
